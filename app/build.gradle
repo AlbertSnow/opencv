@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "site.albertsnow.opencv"
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -23,12 +23,25 @@ android {
     }
 }
 
+task nativeLibsToJar (type: Jar, description: 'create a jar archive of native libs') {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'lib/'
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn(nativeLibsToJar)
+}
+
 dependencies {
+    implementation fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation project(path: ':openCVLibrary330')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
